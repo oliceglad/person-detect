@@ -6,24 +6,6 @@ from typing import Any, Optional, Tuple
 from vars import IMAGE_PATH, MODEL, RESULT_PATH, INFO_INPUT
 
 
-def check_for_helmet(image: Any, box: Any) -> bool:
-    x1, y1, x2, y2 = box
-    head_region = image[y1:y1 + (y2 - y1) // 2, x1:x2]
-    hsv = cv2.cvtColor(head_region, cv2.COLOR_BGR2HSV)
-
-    lower_orange = np.array([5, 100, 100])
-    upper_orange = np.array([15, 255, 255])
-    mask_orange = cv2.inRange(hsv, lower_orange, upper_orange)
-
-    lower_green = np.array([35, 100, 100])
-    upper_green = np.array([85, 255, 255])
-    mask_green = cv2.inRange(hsv, lower_green, upper_green)
-
-    if cv2.countNonZero(mask_orange) > 0 or cv2.countNonZero(mask_green) > 0:
-        return True
-    return False
-
-
 def _euclidean_distance(point1: Optional[list], point2: Optional[list]) -> Any:
     return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
@@ -46,6 +28,23 @@ def _find_count_of_person(image: Any, boxes: Any, confidences: Any, class_ids: A
             cv2.putText(image, text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0, 0), 2)
 
     return num_people, people_centers, people_boxes
+
+def check_for_helmet(image: Any, box: Any) -> bool:
+    x1, y1, x2, y2 = box
+    head_region = image[y1:y1 + (y2 - y1) // 2, x1:x2]
+    hsv = cv2.cvtColor(head_region, cv2.COLOR_BGR2HSV)
+
+    lower_orange = np.array([5, 100, 100])
+    upper_orange = np.array([15, 255, 255])
+    mask_orange = cv2.inRange(hsv, lower_orange, upper_orange)
+
+    lower_green = np.array([35, 100, 100])
+    upper_green = np.array([85, 255, 255])
+    mask_green = cv2.inRange(hsv, lower_green, upper_green)
+
+    if cv2.countNonZero(mask_orange) > 0 or cv2.countNonZero(mask_green) > 0:
+        return True
+    return False
 
 
 def find_groups(image: Any, people_centers: Optional[list], people_boxes: Optional[list]) -> None:
