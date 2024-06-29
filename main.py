@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 from ultralytics import YOLO
-from vars import IMAGE_PATH, MODEL, RESULT_PATH, INFO_INPUT
 from typing import Any, Optional, Tuple
+
+from vars import IMAGE_PATH, MODEL, RESULT_PATH, INFO_INPUT
 
 
 def check_for_helmet(image: Any, box: Any) -> bool:
