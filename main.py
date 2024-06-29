@@ -61,7 +61,7 @@ def find_person_on_image(image_path, result_path, model):
 
     num_people, people_centers, people_boxes = _find_count_of_person(output_image, boxes, confidences, class_ids)
 
-    # cv2.putText(output_image, f'Number of people: {num_people}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.putText(output_image, f'Number of people: {num_people}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     find_groups(output_image, people_centers, people_boxes)
 
