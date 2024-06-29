@@ -1,2 +1,3 @@
 cv2
 ultralytics==8.2.46
+numpy

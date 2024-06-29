@@ -3,6 +3,25 @@ import numpy as np
 from ultralytics import YOLO
 from vars import IMAGE_PATH, MODEL, RESULT_PATH, INFO_INPUT
 
+def check_for_helmet(image, box):
+    x1, y1, x2, y2 = box
+    head_region = image[y1:y1 + (y2 - y1) // 2, x1:x2]
+    hsv = cv2.cvtColor(head_region, cv2.COLOR_BGR2HSV)
+
+
+    lower_orange = np.array([5, 100, 100])
+    upper_orange = np.array([15, 255, 255])
+    mask_orange = cv2.inRange(hsv, lower_orange, upper_orange)
+
+
+    lower_green = np.array([35, 100, 100])
+    upper_green = np.array([85, 255, 255])
+    mask_green = cv2.inRange(hsv, lower_green, upper_green)
+
+    if cv2.countNonZero(mask_orange) > 0 or cv2.countNonZero(mask_green) > 0:
+        return True
+    return False
+
 def _euclidean_distance(point1, point2):
     return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
@@ -19,9 +38,9 @@ def _find_count_of_person(image, boxes, confidences, class_ids):
             center_y = (y1 + y2) // 2
             people_centers.append((center_x, center_y))
             people_boxes.append((x1, y1, x2, y2))
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
             text = f'Person: {confidences[i]:.2f}'
-            cv2.putText(image, text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            cv2.putText(image, text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0, 0), 2)
 
     return num_people, people_centers, people_boxes
 
@@ -65,8 +84,21 @@ def find_person_on_image(image_path, result_path, model):
 
     find_groups(output_image, people_centers, people_boxes)
 
+    num_with_helmet = 0
+    num_without_helmet = 0
+
+    for box in people_boxes:
+        if check_for_helmet(output_image, box):
+            num_with_helmet += 1
+        else:
+            num_without_helmet += 1
+
+    cv2.putText(output_image, f'With Helmet: {num_with_helmet}', (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.putText(output_image, f'Without Helmet: {num_without_helmet}', (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                (0, 255, 0), 2)
+
     cv2.imwrite(result_path, output_image)
-    cv2.imshow('Image with People and Groups Detected', output_image)
+    cv2.imshow('Image with People, Groups, and Helmets Detected', output_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
