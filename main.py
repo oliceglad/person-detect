@@ -2,17 +2,17 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 from vars import IMAGE_PATH, MODEL, RESULT_PATH, INFO_INPUT
+from typing import Any, Optional, Tuple
 
-def check_for_helmet(image, box):
+
+def check_for_helmet(image: Any, box: Any) -> bool:
     x1, y1, x2, y2 = box
     head_region = image[y1:y1 + (y2 - y1) // 2, x1:x2]
     hsv = cv2.cvtColor(head_region, cv2.COLOR_BGR2HSV)
 
-
     lower_orange = np.array([5, 100, 100])
     upper_orange = np.array([15, 255, 255])
     mask_orange = cv2.inRange(hsv, lower_orange, upper_orange)
-
 
     lower_green = np.array([35, 100, 100])
     upper_green = np.array([85, 255, 255])
@@ -22,10 +22,12 @@ def check_for_helmet(image, box):
         return True
     return False
 
-def _euclidean_distance(point1, point2):
+
+def _euclidean_distance(point1: Optional[list], point2: Optional[list]) -> Any:
     return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
-def _find_count_of_person(image, boxes, confidences, class_ids):
+
+def _find_count_of_person(image: Any, boxes: Any, confidences: Any, class_ids: Any) -> Tuple:
     num_people = 0
     people_centers = []
     people_boxes = []
@@ -44,7 +46,8 @@ def _find_count_of_person(image, boxes, confidences, class_ids):
 
     return num_people, people_centers, people_boxes
 
-def find_groups(image, people_centers, people_boxes):
+
+def find_groups(image: Any, people_centers: Optional[list], people_boxes: Optional[list]) -> None:
     groups = []
     visited = set()
 
@@ -67,7 +70,8 @@ def find_groups(image, people_centers, people_boxes):
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
             cv2.putText(image, f'Group of {len(group)}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-def find_person_on_image(image_path, result_path, model):
+
+def find_person_on_image(image_path: str, result_path: str, model: str) -> None:
     image = cv2.imread(image_path)
     model = YOLO(model)
     results = model(image_path, conf=0.2)
