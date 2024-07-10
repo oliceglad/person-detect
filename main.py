@@ -38,11 +38,11 @@ def check_for_helmet(image: Any, box: Any) -> bool:
     upper_orange = np.array([15, 255, 255])
     mask_orange = cv2.inRange(hsv, lower_orange, upper_orange)
 
-    lower_green = np.array([35, 100, 100])
-    upper_green = np.array([85, 255, 255])
-    mask_green = cv2.inRange(hsv, lower_green, upper_green)
+    # lower_green = np.array([35, 100, 100])
+    # upper_green = np.array([85, 255, 255])
+    # mask_green = cv2.inRange(hsv, lower_green, upper_green)
 
-    if cv2.countNonZero(mask_orange) > 0 or cv2.countNonZero(mask_green) > 0:
+    if cv2.countNonZero(mask_orange) > 0:
         return True
     return False
 
